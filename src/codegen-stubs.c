@@ -110,7 +110,7 @@ JL_DLLEXPORT uint64_t jl_getUnwindInfo_fallback(uint64_t dwAddr)
 JL_DLLEXPORT void jl_add_optimization_passes_fallback(void *PM, int opt_level, int lower_intrinsics) UNAVAILABLE
 
 JL_DLLEXPORT void jl_build_newpm_pipeline_fallback(void *MPM, void *PB, int Speedup, int Size,
-    int lower_intrinsics, int dump_native, int external_use, int llvm_only) UNAVAILABLE
+    int lower_intrinsics, int dump_native, int external_use, int llvm_only, int warn_missed_transformations) UNAVAILABLE
 
 JL_DLLEXPORT void jl_register_passbuilder_callbacks_fallback(void *PB) { }
 

@@ -568,7 +568,9 @@ static void buildPipeline(ModulePassManager &MPM, PassBuilder *PB, OptimizationL
         if (O.getSpeedupLevel() >= 2) {
             buildVectorPipeline(FPM, PB, O, options);
         }
-        FPM.addPass(WarnMissedTransformationsPass());
+        if (options.warn_missed_transformations) {
+            FPM.addPass(WarnMissedTransformationsPass());
+        }
         MPM.addPass(createModuleToFunctionPassAdaptor(std::move(FPM)));
     }
     buildIntrinsicLoweringPipeline(MPM, PB, O, options);
@@ -577,7 +579,8 @@ static void buildPipeline(ModulePassManager &MPM, PassBuilder *PB, OptimizationL
 }
 
 extern "C" JL_DLLEXPORT_CODEGEN void jl_build_newpm_pipeline_impl(void *MPM, void *PB, int Speedup, int Size,
-    int lower_intrinsics, int dump_native, int external_use, int llvm_only) JL_NOTSAFEPOINT
+    int lower_intrinsics, int dump_native, int external_use, int llvm_only,
+    int warn_missed_transformations) JL_NOTSAFEPOINT
 {
     OptimizationLevel O;
     switch (Size) {
@@ -604,7 +607,7 @@ extern "C" JL_DLLEXPORT_CODEGEN void jl_build_newpm_pipeline_impl(void *MPM, voi
             }
     }
     buildPipeline(*reinterpret_cast<ModulePassManager*>(MPM), reinterpret_cast<PassBuilder*>(PB), O,
-                    OptimizationOptions{!!lower_intrinsics, !!dump_native, !!external_use, !!llvm_only});
+                    OptimizationOptions{!!lower_intrinsics, !!dump_native, !!external_use, !!llvm_only, !!warn_missed_transformations});
 }
 
 #undef JULIA_PASS
@@ -778,7 +781,8 @@ static llvm::Optional<std::pair<OptimizationLevel, OptimizationOptions>> parseJu
             OPTION(lower_intrinsics),
             OPTION(dump_native),
             OPTION(external_use),
-            OPTION(llvm_only)
+            OPTION(llvm_only),
+            OPTION(warn_missed_transformations)
 #undef OPTION
         };
         while (!name.empty()) {
